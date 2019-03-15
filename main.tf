@@ -1,3 +1,13 @@
+data "aws_ami" "amazon_linux" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn-ami-hvm-*-x86_64-gp2"]
+  }
+}
+
 resource "aws_vpc" "main" {
   cidr_block           = "${var.vpc_cidr}"
   enable_dns_support   = true
@@ -28,7 +38,7 @@ resource "aws_internet_gateway" "main" {
 }
 
 resource "aws_instance" "web" {
-  ami                    = "${var.ami_id}"
+  ami                    = "${data.aws_ami.amazon_linux.id}"
   instance_type          = "${var.instance_type}"
   subnet_id              = "${aws_subnet.main.id}"
   vpc_security_group_ids = ["${aws_security_group.web_sg.id}"]
