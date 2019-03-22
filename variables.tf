@@ -13,6 +13,11 @@ variable "subnet_cidr" {
   default     = "10.0.1.0/24"
 }
 
+variable "subnet_cidr_2" {
+  description = "CIDR block for second subnet (RDS needs 2 AZs)"
+  default     = "10.0.2.0/24"
+}
+
 variable "availability_zone" {
   description = "Availability zone for subnet and EBS"
   default     = "us-east-1a"
@@ -31,4 +36,19 @@ variable "key_name" {
 variable "ami_id" {
   description = "AMI ID for EC2 instance (fallback if data source fails)"
   default     = "ami-0c55b159cbfafe1f0"
+}
+
+variable "db_name" {
+  description = "RDS database name"
+  default     = "mydb"
+}
+
+variable "db_username" {
+  description = "RDS master username"
+  default     = "admin"
+}
+
+variable "db_password" {
+  description = "RDS master password"
+  default     = "password123"
 }

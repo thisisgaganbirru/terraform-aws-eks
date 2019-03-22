@@ -29,6 +29,16 @@ resource "aws_subnet" "main" {
   }
 }
 
+resource "aws_subnet" "main_2" {
+  vpc_id            = "${aws_vpc.main.id}"
+  cidr_block        = "${var.subnet_cidr_2}"
+  availability_zone = "us-east-1b"
+
+  tags = {
+    Name = "main-subnet-2"
+  }
+}
+
 resource "aws_internet_gateway" "main" {
   vpc_id = "${aws_vpc.main.id}"
 
