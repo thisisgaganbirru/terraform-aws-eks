@@ -52,3 +52,8 @@ variable "db_password" {
   description = "RDS master password"
   default     = "password123"
 }
+
+variable "s3_bucket_name" {
+  description = "Name of the S3 bucket"
+  default     = "my-terraform-app-bucket"
+}

@@ -13,3 +13,11 @@ output "instance_public_ip" {
 output "security_group_id" {
   value = "${aws_security_group.web_sg.id}"
 }
+
+output "s3_bucket_name" {
+  value = "${aws_s3_bucket.app_bucket.bucket}"
+}
+
+output "rds_endpoint" {
+  value = "${aws_db_instance.main.endpoint}"
+}
