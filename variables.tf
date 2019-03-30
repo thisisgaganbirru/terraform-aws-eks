@@ -57,3 +57,8 @@ variable "s3_bucket_name" {
   description = "Name of the S3 bucket"
   default     = "my-terraform-app-bucket"
 }
+
+variable "availability_zone_2" {
+  description = "Second availability zone for RDS subnet"
+  default     = "us-east-1b"
+}

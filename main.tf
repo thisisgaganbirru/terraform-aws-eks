@@ -32,7 +32,7 @@ resource "aws_subnet" "main" {
 resource "aws_subnet" "main_2" {
   vpc_id            = "${aws_vpc.main.id}"
   cidr_block        = "${var.subnet_cidr_2}"
-  availability_zone = "us-east-1b"
+  availability_zone = "${var.availability_zone_2}"
 
   tags = {
     Name = "main-subnet-2"
@@ -53,6 +53,7 @@ resource "aws_instance" "web" {
   subnet_id              = "${aws_subnet.main.id}"
   vpc_security_group_ids = ["${aws_security_group.web_sg.id}"]
   key_name               = "${var.key_name}"
+  iam_instance_profile   = "${aws_iam_instance_profile.ec2_profile.name}"
 
   root_block_device {
     volume_type           = "gp2"
