@@ -1,15 +1,19 @@
-# Terraform AWS Infrastructure
+# terraform-aws
 
-Learning Terraform by building AWS infrastructure from scratch.
+my terraform learning project. started this to understand aws properly before my job.
 
-## What's in here
+## whats in here
 
-- **VPC** with subnet and internet gateway
-- **Security Groups** for HTTP and SSH access
-- **EC2 Instance** (t2.micro, Amazon Linux)
-- **EBS Storage** attached to the instance
+- VPC, subnets, internet gateway
+- security groups (SSH + HTTP)
+- EC2 instance (amazon linux, t2.micro)
+- EBS volume attached to EC2
+- RDS mysql database
+- S3 bucket with versioning
+- IAM role so EC2 can access S3
+- remote state in S3 backend
 
-## How to use
+## how to run
 
 ```bash
 terraform init
@@ -17,6 +21,21 @@ terraform plan
 terraform apply
 ```
 
-## Notes
+## requirements
 
-Still learning Terraform. Hardcoded values for now, will improve later.
+- aws cli configured (`aws configure`)
+- an existing key pair in aws (update `key_name` in variables.tf)
+- s3 bucket for remote state must exist before `terraform init`
+
+## files
+
+| file | what it does |
+|------|------|
+| main.tf | vpc, subnets, ec2 |
+| variables.tf | all variables |
+| provider.tf | aws provider |
+| backend.tf | remote state config |
+| security.tf | security groups |
+| storage.tf | ebs, rds, s3 |
+| iam.tf | iam role for ec2 |
+| outputs.tf | output values |
