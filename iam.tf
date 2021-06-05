@@ -24,7 +24,7 @@ EOF
 
 resource "aws_iam_role_policy" "ec2_s3_policy" {
   name = "ec2-s3-policy"
-  role = "${aws_iam_role.ec2_role.id}"
+  role = aws_iam_role.ec2_role.id
 
   policy = <<EOF
 {
@@ -45,5 +45,5 @@ EOF
 
 resource "aws_iam_instance_profile" "ec2_profile" {
   name = "ec2-instance-profile"
-  role = "${aws_iam_role.ec2_role.name}"
+  role = aws_iam_role.ec2_role.name
 }

@@ -1,5 +1,5 @@
 resource "aws_ebs_volume" "web_data" {
-  availability_zone = "${var.availability_zone}"
+  availability_zone = var.availability_zone
   size              = 20
   type              = "gp2"
 
@@ -11,13 +11,13 @@ resource "aws_ebs_volume" "web_data" {
 
 resource "aws_volume_attachment" "web_data_attach" {
   device_name = "/dev/xvdf"
-  volume_id   = "${aws_ebs_volume.web_data.id}"
-  instance_id = "${aws_instance.web.id}"
+  volume_id   = aws_ebs_volume.web_data.id
+  instance_id = aws_instance.web.id
 }
 
 resource "aws_db_subnet_group" "main" {
   name       = "main-db-subnet-group"
-  subnet_ids = ["${aws_subnet.main.id}", "${aws_subnet.main_2.id}"]
+  subnet_ids = [aws_subnet.main.id, aws_subnet.main_2.id]
 
   tags = {
     Name = "main-db-subnet-group"
@@ -32,12 +32,12 @@ resource "aws_db_instance" "main" {
   allocated_storage = 20
   storage_type      = "gp2"
 
-  name     = "${var.db_name}"
-  username = "${var.db_username}"
-  password = "${var.db_password}"
+  name     = var.db_name
+  username = var.db_username
+  password = var.db_password
 
-  db_subnet_group_name   = "${aws_db_subnet_group.main.name}"
-  vpc_security_group_ids = ["${aws_security_group.web_sg.id}"]
+  db_subnet_group_name   = aws_db_subnet_group.main.name
+  vpc_security_group_ids = [aws_security_group.web_sg.id]
 
   skip_final_snapshot = true
 
@@ -48,7 +48,7 @@ resource "aws_db_instance" "main" {
 }
 
 resource "aws_s3_bucket" "app_bucket" {
-  bucket = "${var.s3_bucket_name}"
+  bucket = var.s3_bucket_name
   acl    = "private"
 
   versioning {

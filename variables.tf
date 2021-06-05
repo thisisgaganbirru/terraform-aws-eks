@@ -51,6 +51,7 @@ variable "db_username" {
 variable "db_password" {
   description = "RDS master password"
   default     = "password123"
+  sensitive   = true
 }
 
 variable "s3_bucket_name" {
