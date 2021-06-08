@@ -1,68 +1,45 @@
-data "aws_ami" "amazon_linux" {
-  most_recent = true
-  owners      = ["amazon"]
+module "vpc" {
+  source = "./modules/vpc"
 
-  filter {
-    name   = "name"
-    values = ["amzn-ami-hvm-*-x86_64-gp2"]
-  }
+  vpc_cidr            = var.vpc_cidr
+  subnet_cidr         = var.subnet_cidr
+  subnet_cidr_2       = var.subnet_cidr_2
+  availability_zone   = var.availability_zone
+  availability_zone_2 = var.availability_zone_2
 }
 
-resource "aws_vpc" "main" {
-  cidr_block           = var.vpc_cidr
-  enable_dns_support   = true
-  enable_dns_hostnames = true
+module "iam" {
+  source = "./modules/iam"
 
-  tags = {
-    Name = "main-vpc"
-    Env  = "dev"
-  }
+  s3_bucket_name = var.s3_bucket_name
 }
 
-resource "aws_subnet" "main" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = var.subnet_cidr
-  availability_zone = var.availability_zone
+module "ec2" {
+  source = "./modules/ec2"
 
-  tags = {
-    Name = "main-subnet"
-  }
+  instance_type        = var.instance_type
+  key_name             = var.key_name
+  subnet_id            = module.vpc.subnet_id
+  vpc_id               = module.vpc.vpc_id
+  availability_zone    = var.availability_zone
+  iam_instance_profile = module.iam.instance_profile_name
+  ami_id               = var.ami_id
+  security_group_id    = module.ec2.security_group_id
 }
 
-resource "aws_subnet" "main_2" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = var.subnet_cidr_2
-  availability_zone = var.availability_zone_2
+module "rds" {
+  source = "./modules/rds"
 
-  tags = {
-    Name = "main-subnet-2"
-  }
+  db_name           = var.db_name
+  db_username       = var.db_username
+  db_password       = var.db_password
+  subnet_id         = module.vpc.subnet_id
+  subnet_id_2       = module.vpc.subnet_id_2
+  security_group_id = module.ec2.security_group_id
 }
 
-resource "aws_internet_gateway" "main" {
-  vpc_id = aws_vpc.main.id
+module "s3" {
+  source = "./modules/s3"
 
-  tags = {
-    Name = "main-igw"
-  }
-}
-
-resource "aws_instance" "web" {
-  ami                    = data.aws_ami.amazon_linux.id
-  instance_type          = var.instance_type
-  subnet_id              = aws_subnet.main.id
-  vpc_security_group_ids = [aws_security_group.web_sg.id]
-  key_name               = var.key_name
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name
-
-  root_block_device {
-    volume_type           = "gp2"
-    volume_size           = 20
-    delete_on_termination = true
-  }
-
-  tags = {
-    Name = "web-server"
-    Env  = "dev"
-  }
+  s3_bucket_name = var.s3_bucket_name
 }

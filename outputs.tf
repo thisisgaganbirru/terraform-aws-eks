@@ -1,23 +1,24 @@
 output "vpc_id" {
-  value = aws_vpc.main.id
-}
-
-output "subnet_id" {
-  value = aws_subnet.main.id
+  description = "VPC ID"
+  value       = module.vpc.vpc_id
 }
 
 output "instance_public_ip" {
-  value = aws_instance.web.public_ip
+  description = "EC2 public IP"
+  value       = module.ec2.instance_public_ip
 }
 
 output "security_group_id" {
-  value = aws_security_group.web_sg.id
+  description = "Web security group ID"
+  value       = module.ec2.security_group_id
 }
 
 output "s3_bucket_name" {
-  value = aws_s3_bucket.app_bucket.bucket
+  description = "S3 bucket name"
+  value       = module.s3.bucket_name
 }
 
 output "rds_endpoint" {
-  value = aws_db_instance.main.endpoint
+  description = "RDS endpoint"
+  value       = module.rds.rds_endpoint
 }
