@@ -76,3 +76,9 @@ variable "s3_bucket_name" {
   type        = string
   default     = "my-terraform-app-bucket"
 }
+
+variable "ssh_allowed_cidr" {
+  description = "CIDR allowed to SSH into EC2 - restrict to your IP"
+  type        = string
+  default     = "0.0.0.0/0"
+}

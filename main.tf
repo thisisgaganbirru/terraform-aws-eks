@@ -25,6 +25,7 @@ module "ec2" {
   iam_instance_profile = module.iam.instance_profile_name
   ami_id               = var.ami_id
   security_group_id    = module.ec2.security_group_id
+  ssh_allowed_cidr     = var.ssh_allowed_cidr
 }
 
 module "rds" {
