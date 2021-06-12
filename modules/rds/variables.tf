@@ -24,7 +24,12 @@ variable "subnet_id_2" {
   type        = string
 }
 
-variable "security_group_id" {
-  description = "Security group ID for RDS"
+variable "vpc_id" {
+  description = "VPC ID for RDS security group"
+  type        = string
+}
+
+variable "web_sg_id" {
+  description = "Web security group ID to allow MySQL access from EC2"
   type        = string
 }

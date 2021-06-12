@@ -31,12 +31,13 @@ module "ec2" {
 module "rds" {
   source = "./modules/rds"
 
-  db_name           = var.db_name
-  db_username       = var.db_username
-  db_password       = var.db_password
-  subnet_id         = module.vpc.subnet_id
-  subnet_id_2       = module.vpc.subnet_id_2
-  security_group_id = module.ec2.security_group_id
+  db_name     = var.db_name
+  db_username = var.db_username
+  db_password = var.db_password
+  subnet_id   = module.vpc.subnet_id
+  subnet_id_2 = module.vpc.subnet_id_2
+  vpc_id      = module.vpc.vpc_id
+  web_sg_id   = module.ec2.security_group_id
 }
 
 module "s3" {
