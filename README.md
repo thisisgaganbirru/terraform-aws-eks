@@ -1,19 +1,32 @@
 # terraform-aws
 
-my terraform learning project. started this to understand aws properly before my job.
+AWS infrastructure using Terraform with a modular structure.
 
-## whats in here
+## Prerequisites
 
-- VPC, subnets, internet gateway
-- security groups (SSH + HTTP)
-- EC2 instance (amazon linux, t2.micro)
-- EBS volume attached to EC2
-- RDS mysql database
-- S3 bucket with versioning
-- IAM role so EC2 can access S3
-- remote state in S3 backend
+- Terraform >= 0.14
+- AWS CLI configured (`aws configure`)
+- Existing EC2 key pair in AWS
+- S3 bucket for remote state must exist before running `terraform init`
 
-## how to run
+## Structure
+
+```
+├── main.tf           # root module, calls all child modules
+├── variables.tf      # input variables with validation
+├── outputs.tf        # output values
+├── provider.tf       # aws provider config
+├── backend.tf        # remote state config
+├── terraform.tfvars  # variable values
+└── modules/
+    ├── vpc/          # vpc, subnets, internet gateway
+    ├── ec2/          # ec2 instance, security group, ebs
+    ├── rds/          # rds mysql, subnet group, security group
+    ├── s3/           # s3 bucket with versioning
+    └── iam/          # iam role and instance profile for ec2
+```
+
+## Usage
 
 ```bash
 terraform init
@@ -21,21 +34,20 @@ terraform plan
 terraform apply
 ```
 
-## requirements
+## Inputs
 
-- aws cli configured (`aws configure`)
-- an existing key pair in aws (update `key_name` in variables.tf)
-- s3 bucket for remote state must exist before `terraform init`
+| Name | Description | Default |
+|------|-------------|---------|
+| region | AWS region | us-east-1 |
+| instance_type | EC2 instance type | t2.micro |
+| db_password | RDS master password | - |
+| ssh_allowed_cidr | CIDR allowed to SSH | 0.0.0.0/0 |
 
-## files
+## Outputs
 
-| file | what it does |
-|------|------|
-| main.tf | vpc, subnets, ec2 |
-| variables.tf | all variables |
-| provider.tf | aws provider |
-| backend.tf | remote state config |
-| security.tf | security groups |
-| storage.tf | ebs, rds, s3 |
-| iam.tf | iam role for ec2 |
-| outputs.tf | output values |
+| Name | Description |
+|------|-------------|
+| vpc_id | VPC ID |
+| instance_public_ip | EC2 public IP |
+| rds_endpoint | RDS connection endpoint |
+| s3_bucket_name | S3 bucket name |
