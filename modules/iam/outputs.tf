@@ -4,6 +4,17 @@ output "instance_profile_name" {
 }
 
 output "role_arn" {
-  description = "IAM role ARN"
+  description = "IAM role ARN for EC2"
   value       = aws_iam_role.ec2_role.arn
 }
+
+output "eks_cluster_role_arn" {
+  description = "IAM role ARN for EKS control plane"
+  value       = aws_iam_role.eks_cluster_role.arn
+}
+
+output "eks_node_role_arn" {
+  description = "IAM role ARN for EKS worker nodes"
+  value       = aws_iam_role.eks_node_role.arn
+}
+
