@@ -15,6 +15,37 @@ resource "aws_security_group" "eks_cluster" {
   }
 }
 
+resource "aws_security_group" "eks_nodes" {
+  name        = "${var.cluster_name}-node-sg"
+  description = "Security group for EKS worker nodes"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    security_groups = [aws_security_group.eks_cluster.id]
+  }
+
+  ingress {
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
+    self      = true
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.cluster_name}-node-sg"
+  }
+}
+
 resource "aws_eks_cluster" "main" {
   name     = var.cluster_name
   version  = var.cluster_version
@@ -32,4 +63,29 @@ resource "aws_eks_cluster" "main" {
   }
 
   depends_on = [aws_security_group.eks_cluster]
+}
+
+resource "aws_eks_node_group" "main" {
+  cluster_name    = aws_eks_cluster.main.name
+  node_group_name = "${var.cluster_name}-node-group"
+  node_role_arn   = var.node_role_arn
+  subnet_ids      = var.subnet_ids
+
+  instance_types = [var.node_instance_type]
+
+  scaling_config {
+    desired_size = var.node_desired_size
+    min_size     = var.node_min_size
+    max_size     = var.node_max_size
+  }
+
+  update_config {
+    max_unavailable = 1
+  }
+
+  tags = {
+    Name = "${var.cluster_name}-node-group"
+  }
+
+  depends_on = [aws_eks_cluster.main]
 }
