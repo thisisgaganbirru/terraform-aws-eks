@@ -22,3 +22,14 @@ output "rds_endpoint" {
   description = "RDS endpoint"
   value       = module.rds.rds_endpoint
 }
+
+output "eks_cluster_name" {
+  description = "EKS cluster name"
+  value       = module.eks.cluster_name
+}
+
+output "eks_cluster_endpoint" {
+  description = "EKS cluster endpoint URL"
+  value       = module.eks.cluster_endpoint
+}
+

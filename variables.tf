@@ -21,7 +21,7 @@ variable "vpc_cidr" {
 }
 
 variable "subnet_cidr" {
-  description = "CIDR block for the first subnet"
+  description = "CIDR block for the first public subnet"
   type        = string
   default     = "10.0.1.0/24"
 
@@ -32,13 +32,35 @@ variable "subnet_cidr" {
 }
 
 variable "subnet_cidr_2" {
-  description = "CIDR block for the second subnet"
+  description = "CIDR block for the second public subnet"
   type        = string
   default     = "10.0.2.0/24"
 
   validation {
     condition     = can(cidrnetmask(var.subnet_cidr_2))
     error_message = "Subnet CIDR must be a valid IPv4 CIDR block."
+  }
+}
+
+variable "private_subnet_cidr_1" {
+  description = "CIDR block for the first private subnet"
+  type        = string
+  default     = "10.0.3.0/24"
+
+  validation {
+    condition     = can(cidrnetmask(var.private_subnet_cidr_1))
+    error_message = "Private subnet CIDR must be a valid IPv4 CIDR block."
+  }
+}
+
+variable "private_subnet_cidr_2" {
+  description = "CIDR block for the second private subnet"
+  type        = string
+  default     = "10.0.4.0/24"
+
+  validation {
+    condition     = can(cidrnetmask(var.private_subnet_cidr_2))
+    error_message = "Private subnet CIDR must be a valid IPv4 CIDR block."
   }
 }
 
@@ -122,3 +144,40 @@ variable "ssh_allowed_cidr" {
     error_message = "SSH allowed CIDR must be a valid IPv4 CIDR block."
   }
 }
+
+variable "cluster_name" {
+  description = "Name of the EKS cluster"
+  type        = string
+  default     = "main-eks-cluster"
+}
+
+variable "cluster_version" {
+  description = "Kubernetes version for the EKS cluster"
+  type        = string
+  default     = "1.20"
+}
+
+variable "node_instance_type" {
+  description = "EC2 instance type for EKS worker nodes"
+  type        = string
+  default     = "t3.medium"
+}
+
+variable "node_desired_size" {
+  description = "Desired number of EKS worker nodes"
+  type        = number
+  default     = 2
+}
+
+variable "node_min_size" {
+  description = "Minimum number of EKS worker nodes"
+  type        = number
+  default     = 1
+}
+
+variable "node_max_size" {
+  description = "Maximum number of EKS worker nodes"
+  type        = number
+  default     = 4
+}
+
