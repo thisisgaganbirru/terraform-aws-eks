@@ -1,11 +1,14 @@
 module "vpc" {
   source = "./modules/vpc"
 
-  vpc_cidr            = var.vpc_cidr
-  subnet_cidr         = var.subnet_cidr
-  subnet_cidr_2       = var.subnet_cidr_2
-  availability_zone   = var.availability_zone
-  availability_zone_2 = var.availability_zone_2
+  vpc_cidr              = var.vpc_cidr
+  subnet_cidr           = var.subnet_cidr
+  subnet_cidr_2         = var.subnet_cidr_2
+  private_subnet_cidr_1 = var.private_subnet_cidr_1
+  private_subnet_cidr_2 = var.private_subnet_cidr_2
+  availability_zone     = var.availability_zone
+  availability_zone_2   = var.availability_zone_2
+  cluster_name          = var.cluster_name
 }
 
 module "iam" {
@@ -45,3 +48,19 @@ module "s3" {
 
   s3_bucket_name = var.s3_bucket_name
 }
+
+module "eks" {
+  source = "./modules/eks"
+
+  cluster_name       = var.cluster_name
+  cluster_version    = var.cluster_version
+  vpc_id             = module.vpc.vpc_id
+  subnet_ids         = module.vpc.private_subnet_ids
+  node_instance_type = var.node_instance_type
+  node_desired_size  = var.node_desired_size
+  node_min_size      = var.node_min_size
+  node_max_size      = var.node_max_size
+  cluster_role_arn   = module.iam.eks_cluster_role_arn
+  node_role_arn      = module.iam.eks_node_role_arn
+}
+

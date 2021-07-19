@@ -4,12 +4,22 @@ variable "vpc_cidr" {
 }
 
 variable "subnet_cidr" {
-  description = "CIDR block for the first subnet"
+  description = "CIDR block for the first public subnet"
   type        = string
 }
 
 variable "subnet_cidr_2" {
-  description = "CIDR block for the second subnet"
+  description = "CIDR block for the second public subnet"
+  type        = string
+}
+
+variable "private_subnet_cidr_1" {
+  description = "CIDR block for the first private subnet"
+  type        = string
+}
+
+variable "private_subnet_cidr_2" {
+  description = "CIDR block for the second private subnet"
   type        = string
 }
 
@@ -20,5 +30,10 @@ variable "availability_zone" {
 
 variable "availability_zone_2" {
   description = "Secondary availability zone"
+  type        = string
+}
+
+variable "cluster_name" {
+  description = "EKS cluster name used for subnet tagging"
   type        = string
 }
