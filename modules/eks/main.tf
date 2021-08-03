@@ -58,6 +58,8 @@ resource "aws_eks_cluster" "main" {
     endpoint_public_access  = true
   }
 
+  enabled_cluster_log_types = [ "api", "audit", "authenticator", "controllerManager", "scheduler" ]
+
   tags = {
     Name = var.cluster_name
   }
@@ -88,4 +90,18 @@ resource "aws_eks_node_group" "main" {
   }
 
   depends_on = [aws_eks_cluster.main]
+}
+
+data "tls_certificate" "eks_cluster" {
+  url = aws_eks_cluster.main.identity[0].oidc[0].issuer
+}
+
+resource "aws_iam_openid_connect_provider" "eks_cluster" {
+  client_id_list = [ "sts.amazonaws.com" ]
+  thumbprint_list = [ data.tls_certificate.eks_cluster.certificates[0].sha1_fingerprint ]
+  url = aws_eks_cluster.main.identity[0].oidc[0].issuer
+
+  tags = {
+    Name = "${var.cluster_name}-irsa"
+  }
 }
