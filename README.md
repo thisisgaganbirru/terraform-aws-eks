@@ -24,7 +24,7 @@ AWS infrastructure using Terraform with a modular structure. Includes VPC, EC2, 
     ├── rds/          # rds mysql, subnet group, security group
     ├── s3/           # s3 bucket with versioning
     ├── iam/          # iam roles for ec2 and eks
-    └── eks/          # eks cluster, managed node group, security groups
+    └── eks/          # eks cluster, managed node group, oidc provider, managed addons
 ```
 
 ## Usage
@@ -62,3 +62,5 @@ terraform apply
 | s3_bucket_name       | S3 bucket name           |
 | eks_cluster_name     | EKS cluster name         |
 | eks_cluster_endpoint | EKS cluster API endpoint |
+| oidc_provider_arn    | OIDC provider ARN for IRSA |
+| oidc_provider_url    | OIDC provider URL          |
