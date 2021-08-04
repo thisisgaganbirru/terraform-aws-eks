@@ -1,4 +1,4 @@
-# terraform-aws
+# terraform-aws-eks
 
 AWS infrastructure using Terraform with a modular structure. Includes VPC, EC2, RDS, S3, IAM, and EKS.
 
@@ -37,29 +37,28 @@ terraform apply
 
 ## Inputs
 
-| Name | Description | Default |
-|------|-------------|---------|
-| region | AWS region | us-east-1 |
-| instance_type | EC2 instance type | t2.micro |
-| db_password | RDS master password | - |
-| ssh_allowed_cidr | CIDR allowed to SSH | 0.0.0.0/0 |
-| private_subnet_cidr_1 | First private subnet CIDR | 10.0.3.0/24 |
-| private_subnet_cidr_2 | Second private subnet CIDR | 10.0.4.0/24 |
-| cluster_name | EKS cluster name | main-eks-cluster |
-| cluster_version | Kubernetes version | 1.20 |
-| node_instance_type | EKS worker node instance type | t3.medium |
-| node_desired_size | Desired number of worker nodes | 2 |
-| node_min_size | Minimum number of worker nodes | 1 |
-| node_max_size | Maximum number of worker nodes | 4 |
+| Name                  | Description                    | Default          |
+| --------------------- | ------------------------------ | ---------------- |
+| region                | AWS region                     | us-east-1        |
+| instance_type         | EC2 instance type              | t2.micro         |
+| db_password           | RDS master password            | -                |
+| ssh_allowed_cidr      | CIDR allowed to SSH            | 0.0.0.0/0        |
+| private_subnet_cidr_1 | First private subnet CIDR      | 10.0.3.0/24      |
+| private_subnet_cidr_2 | Second private subnet CIDR     | 10.0.4.0/24      |
+| cluster_name          | EKS cluster name               | main-eks-cluster |
+| cluster_version       | Kubernetes version             | 1.20             |
+| node_instance_type    | EKS worker node instance type  | t3.medium        |
+| node_desired_size     | Desired number of worker nodes | 2                |
+| node_min_size         | Minimum number of worker nodes | 1                |
+| node_max_size         | Maximum number of worker nodes | 4                |
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| vpc_id | VPC ID |
-| instance_public_ip | EC2 public IP |
-| rds_endpoint | RDS connection endpoint |
-| s3_bucket_name | S3 bucket name |
-| eks_cluster_name | EKS cluster name |
+| Name                 | Description              |
+| -------------------- | ------------------------ |
+| vpc_id               | VPC ID                   |
+| instance_public_ip   | EC2 public IP            |
+| rds_endpoint         | RDS connection endpoint  |
+| s3_bucket_name       | S3 bucket name           |
+| eks_cluster_name     | EKS cluster name         |
 | eks_cluster_endpoint | EKS cluster API endpoint |
-

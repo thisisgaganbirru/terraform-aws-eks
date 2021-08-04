@@ -1,6 +1,6 @@
 locals {
   common_tags = {
-    Project   = "terraform-aws"
+    Project   = "terraform-aws-eks"
     ManagedBy = "terraform"
     Env       = "dev"
   }
