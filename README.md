@@ -35,6 +35,19 @@ terraform plan
 terraform apply
 ```
 
+## CI/CD
+
+This project uses GitHub Actions for continuous integration. On every push or pull request to `main`, the pipeline runs:
+
+- `terraform fmt` — checks formatting
+- `terraform validate` — validates configuration
+- `terraform plan` — previews infrastructure changes
+- `tfsec` — scans for security issues
+
+Required GitHub Secrets: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `DB_PASSWORD`
+
+> `db_password` is intentionally excluded from `terraform.tfvars`. Pass it via `TF_VAR_db_password` locally or via GitHub Secrets in CI.
+
 ## Inputs
 
 | Name                  | Description                    | Default          |
