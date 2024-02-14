@@ -18,3 +18,7 @@ output "eks_node_role_arn" {
   value       = aws_iam_role.eks_node_role.arn
 }
 
+output "cluster_autoscaler_role_arn" {
+  description = "IAM role ARN for cluster autoscaler"
+  value       = aws_iam_role.cluster_autoscaler.arn
+}

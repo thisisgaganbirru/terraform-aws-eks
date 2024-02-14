@@ -127,3 +127,73 @@ resource "aws_eks_addon" "vpc_cni" {
   depends_on = [ aws_eks_node_group.main ]
   
 }
+
+resource "aws_eks_node_group" "spot" {
+  cluster_name = aws_eks_cluster.main.name
+  node_group_name = "${var.cluster_name}-spot"
+  node_role_arn = var.node_role_arn
+  subnet_ids = var.subnet_ids
+
+  capacity_type = "SPOT"
+  instance_types = [ "t3.medium", "t3.large", "t3a.medium" ]
+
+  scaling_config {
+    desired_size = var.spot_desired_size
+    min_size = var.spot_min_size
+    max_size = var.spot_max_size
+  }
+
+  update_config {
+    max_unavailable = 1
+  }
+
+  labels = {
+    role = "spot"
+    env = var.environment
+  }
+
+  tags = {
+    Name = "${var.cluster_name}-spot"
+    "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned"
+    "k8s.io/cluster-autoscaler/enabled" = "true"
+  }
+
+  depends_on = [ aws_eks_cluster.main ]
+}
+
+resource "aws_eks_node_group" "system" {
+  cluster_name = aws_eks_cluster.main.name
+  node_group_name = "${var.cluster_name}-system"
+  node_role_arn = var.node_role_arn
+  subnet_ids = var.subnet_ids
+
+  capacity_type = "ON_DEMAND"
+  instance_types = [ "t3.medium" ]
+
+  scaling_config {
+    desired_size = 2
+    min_size = 2
+    max_size = 2
+  }
+
+  update_config {
+    max_unavailable = 1
+  }
+
+  labels = {
+    role = "system"
+    env = var.environment
+  }
+  
+  taint {
+    key = "CriticalAddonsOnly"
+    value = "true"
+    effect = "NO_SCHEDULE"
+  }
+
+  tags = {
+    Name = "${var.cluster_name}-system"
+  }
+  
+  depends_on = [ aws_eks_cluster.main ]
+}
