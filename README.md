@@ -4,7 +4,7 @@ AWS infrastructure using Terraform with a modular structure. Includes VPC, EC2, 
 
 ## Prerequisites
 
-- Terraform >= 0.14
+- Terraform >= 1.6
 - AWS CLI configured (`aws configure`)
 - Existing EC2 key pair in AWS
 - S3 bucket for remote state must exist before running `terraform init`
@@ -17,14 +17,14 @@ AWS infrastructure using Terraform with a modular structure. Includes VPC, EC2, 
 ├── outputs.tf        # output values
 ├── provider.tf       # aws provider config
 ├── backend.tf        # remote state config
-├── terraform.tfvars  # variable values
+├── envs/             # environment specific tfvars (dev, staging)
 └── modules/
     ├── vpc/          # vpc, public/private subnets, nat gateway, route tables
     ├── ec2/          # ec2 instance, security group, ebs
     ├── rds/          # rds mysql, subnet group, security group
     ├── s3/           # s3 bucket with versioning
-    ├── iam/          # iam roles for ec2 and eks
-    └── eks/          # eks cluster, managed node group, oidc provider, managed addons
+    ├── iam/          # iam roles for ec2, eks, cluster autoscaler
+    └── eks/          # eks cluster, on-demand/spot/system node groups, oidc, addons
 ```
 
 ## Usage
@@ -59,11 +59,15 @@ Required GitHub Secrets: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `DB_PASSW
 | private_subnet_cidr_1 | First private subnet CIDR      | 10.0.3.0/24      |
 | private_subnet_cidr_2 | Second private subnet CIDR     | 10.0.4.0/24      |
 | cluster_name          | EKS cluster name               | main-eks-cluster |
-| cluster_version       | Kubernetes version             | 1.20             |
+| cluster_version       | Kubernetes version             | 1.28             |
 | node_instance_type    | EKS worker node instance type  | t3.medium        |
 | node_desired_size     | Desired number of worker nodes | 2                |
 | node_min_size         | Minimum number of worker nodes | 1                |
 | node_max_size         | Maximum number of worker nodes | 4                |
+| spot_desired_size     | Desired number of spot nodes   | 1                |
+| spot_min_size         | Minimum number of spot nodes   | 0                |
+| spot_max_size         | Maximum number of spot nodes   | 2                |
+| environment           | Deployment environment         | dev              |
 
 ## Outputs
 
@@ -75,5 +79,6 @@ Required GitHub Secrets: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `DB_PASSW
 | s3_bucket_name       | S3 bucket name           |
 | eks_cluster_name     | EKS cluster name         |
 | eks_cluster_endpoint | EKS cluster API endpoint |
-| oidc_provider_arn    | OIDC provider ARN for IRSA |
-| oidc_provider_url    | OIDC provider URL          |
+| oidc_provider_arn         | OIDC provider ARN for IRSA         |
+| oidc_provider_url         | OIDC provider URL                  |
+| cluster_autoscaler_role_arn | Cluster autoscaler IAM role ARN  |
