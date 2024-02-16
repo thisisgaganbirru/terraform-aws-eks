@@ -23,8 +23,8 @@ AWS infrastructure using Terraform with a modular structure. Includes VPC, EC2, 
     ├── ec2/          # ec2 instance, security group, ebs
     ├── rds/          # rds mysql, subnet group, security group
     ├── s3/           # s3 bucket with versioning
-    ├── iam/          # iam roles for ec2, eks, cluster autoscaler
-    └── eks/          # eks cluster, on-demand/spot/system node groups, oidc, addons
+    ├── iam/          # iam roles for ec2, eks, cluster autoscaler, ebs csi, alb controller
+    └── eks/          # eks cluster, on-demand/spot/system node groups, oidc, pinned addons
 ```
 
 ## Usage
@@ -71,14 +71,16 @@ Required GitHub Secrets: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `DB_PASSW
 
 ## Outputs
 
-| Name                 | Description              |
-| -------------------- | ------------------------ |
-| vpc_id               | VPC ID                   |
-| instance_public_ip   | EC2 public IP            |
-| rds_endpoint         | RDS connection endpoint  |
-| s3_bucket_name       | S3 bucket name           |
-| eks_cluster_name     | EKS cluster name         |
-| eks_cluster_endpoint | EKS cluster API endpoint |
-| oidc_provider_arn         | OIDC provider ARN for IRSA         |
-| oidc_provider_url         | OIDC provider URL                  |
-| cluster_autoscaler_role_arn | Cluster autoscaler IAM role ARN  |
+| Name                        | Description                     |
+| --------------------------- | ------------------------------- |
+| vpc_id                      | VPC ID                          |
+| instance_public_ip          | EC2 public IP                   |
+| rds_endpoint                | RDS connection endpoint         |
+| s3_bucket_name              | S3 bucket name                  |
+| eks_cluster_name            | EKS cluster name                |
+| eks_cluster_endpoint        | EKS cluster API endpoint        |
+| oidc_provider_arn           | OIDC provider ARN for IRSA      |
+| oidc_provider_url           | OIDC provider URL               |
+| cluster_autoscaler_role_arn         | Cluster autoscaler IAM role ARN           |
+| ebs_csi_driver_arn                  | EBS CSI driver IAM role ARN               |
+| aws_load_balancer_controller_arn    | AWS Load Balancer Controller IAM role ARN |
