@@ -21,17 +21,21 @@ resource "aws_security_group" "eks_nodes" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
     security_groups = [aws_security_group.eks_cluster.id]
+    description = "Allow Https traffic from EKS control plane"
   }
 
   ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    from_port = 1025
+    to_port   = 65535
+    protocol  = "tcp"
     self      = true
+    security_groups = [aws_security_group.eks_cluster.id]
+    description     = "Allow kubelet and nodeport traffic from control plane"
+
   }
 
   egress {
@@ -109,6 +113,7 @@ resource "aws_iam_openid_connect_provider" "eks_cluster" {
 resource "aws_eks_addon" "coredns" {
   cluster_name = aws_eks_cluster.main.name
   addon_name = "coredns"
+  addon_version = "v1.10.1-eksbuild.6"
 
   depends_on = [ aws_eks_node_group.main ]
 }
@@ -116,6 +121,7 @@ resource "aws_eks_addon" "coredns" {
 resource "aws_eks_addon" "kube_proxy" {
   cluster_name = aws_eks_cluster.main.name
   addon_name = "kube-proxy"
+  addon_version = "v1.28.4-eksbuild.4"
 
   depends_on = [ aws_eks_node_group.main ]
 }
@@ -123,9 +129,18 @@ resource "aws_eks_addon" "kube_proxy" {
 resource "aws_eks_addon" "vpc_cni" {
   cluster_name = aws_eks_cluster.main.name
   addon_name = "vpc-cni"
-
+  addon_version = "v1.16.0-eksbuild.1"
   depends_on = [ aws_eks_node_group.main ]
   
+}
+
+resource "aws_eks_addon" "ebs_csi_driver" {
+  cluster_name = aws_eks_cluster.main.name
+  addon_name = "aws-ebs-csi-driver"
+  addon_version = "v1.26.0-eksbuild.1"
+  service_account_role_arn = var.ebs_csi_driver_role_arn
+
+  depends_on = [ aws_eks_node_group.main ]
 }
 
 resource "aws_eks_node_group" "spot" {

@@ -154,3 +154,57 @@ resource "aws_iam_role_policy" "cluster_autoscaler_policy" {
     ]
   })
 }
+
+resource "aws_iam_role" "ebs_csi_driver" {
+  name = "${var.cluster_name}-ebs-csi-driver"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = var.oidc_provider_arn
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name = "${var.cluster_name}-ebs-csi-driver"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "ebs_csi_driver_policy" {
+  role       = aws_iam_role.ebs_csi_driver.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+}
+
+resource "aws_iam_role" "aws_load_balancer_controller" {
+  name = "${var.cluster_name}-aws-load-balancer-controller"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = var.oidc_provider_arn
+        }
+      }
+    ]
+  })
+
+  tags = {
+    Name = "${var.cluster_name}-aws-load-balancer-controller"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller_policy" {
+  role       = aws_iam_role.aws_load_balancer_controller.name
+  policy_arn = "arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess"
+}
+
+
