@@ -16,3 +16,10 @@ override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+
+# keep lockfile in version control
+!.terraform.lock.hcl
+
+# terraform plan output files
+*.tfplan
+*.tfstate.backup
