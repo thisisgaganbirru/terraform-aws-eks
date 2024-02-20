@@ -1,6 +1,23 @@
 # terraform-aws-eks
 
-AWS infrastructure using Terraform with a modular structure. Includes VPC, EC2, RDS, S3, IAM, and EKS.
+Production-grade AWS infrastructure provisioned with Terraform. This project evolved from a simple AWS setup into a fully modular, multi-environment EKS platform with automated CI/CD, IRSA-based IAM, and security-hardened networking.
+
+## Architecture Overview
+
+This project provisions the following AWS infrastructure:
+
+- **VPC** — Custom VPC with public and private subnets across 2 availability zones, NAT Gateway for private subnet egress, and route tables
+- **EKS Cluster** — Managed Kubernetes cluster (v1.28) with 3 node groups:
+  - `main` — On-demand nodes for general workloads
+  - `system` — Dedicated on-demand nodes for kube-system with `CriticalAddonsOnly` taint
+  - `spot` — Spot instances for cost-optimized workloads, tagged for Cluster Autoscaler
+- **EKS Managed Add-ons** — Pinned versions of CoreDNS, kube-proxy, VPC CNI, and EBS CSI Driver
+- **OIDC Provider** — Enables IAM Roles for Service Accounts (IRSA) for secure pod-level AWS access
+- **IAM Roles** — Least-privilege roles for EKS cluster, node groups, Cluster Autoscaler, EBS CSI Driver, and AWS Load Balancer Controller
+- **EC2** — Bastion/web instance with configurable SSH access and IAM instance profile
+- **RDS MySQL** — Private subnet RDS instance, accessible only from the web tier security group
+- **S3** — Versioned S3 bucket for application storage
+- **Remote State** — Terraform state stored in S3 with DynamoDB locking
 
 ## Prerequisites
 
@@ -12,75 +29,90 @@ AWS infrastructure using Terraform with a modular structure. Includes VPC, EC2, 
 ## Structure
 
 ```
-├── main.tf           # root module, calls all child modules
-├── variables.tf      # input variables with validation
-├── outputs.tf        # output values
-├── provider.tf       # aws provider config
-├── backend.tf        # remote state config
-├── envs/             # environment specific tfvars (dev, staging)
+├── main.tf               # root module, wires all child modules together
+├── variables.tf          # input variables with validation rules
+├── outputs.tf            # output values exposed from root module
+├── provider.tf           # aws and tls provider config
+├── backend.tf            # s3 remote state and dynamodb lock config
+├── locals.tf             # common tags and workspace-aware locals
+├── envs/
+│   ├── dev.tfvars        # dev environment variable values
+│   └── staging.tfvars    # staging environment variable values
+├── .github/
+│   └── workflows/
+│       ├── terraform.yml        # ci: fmt, validate, plan, tfsec on PR
+│       └── terraform-apply.yml  # cd: apply on merge to main (manual approval)
 └── modules/
-    ├── vpc/          # vpc, public/private subnets, nat gateway, route tables
-    ├── ec2/          # ec2 instance, security group, ebs
-    ├── rds/          # rds mysql, subnet group, security group
-    ├── s3/           # s3 bucket with versioning
-    ├── iam/          # iam roles for ec2, eks, cluster autoscaler, ebs csi, alb controller
-    └── eks/          # eks cluster, on-demand/spot/system node groups, oidc, pinned addons
+    ├── vpc/    # vpc, public/private subnets, nat gateway, route tables, igw
+    ├── ec2/    # ec2 instance, security group, ebs volume, iam profile
+    ├── rds/    # rds mysql, db subnet group, private security group
+    ├── s3/     # s3 bucket with versioning enabled
+    ├── iam/    # iam roles for ec2, eks cluster, node group, cluster autoscaler,
+    │           # ebs csi driver, aws load balancer controller
+    └── eks/    # eks cluster, 3 node groups (main/system/spot), oidc provider,
+                # pinned managed addons (coredns, kube-proxy, vpc-cni, ebs-csi)
 ```
 
 ## Usage
 
+### Clone and init
+
 ```bash
+git clone https://github.com/thisisgaganbirru/terraform-aws-eks.git
+cd terraform-aws-eks
 terraform init
-terraform plan
-terraform apply
+```
+
+### Deploy to dev
+
+```bash
+terraform plan -var-file="envs/dev.tfvars" -var="db_password=$TF_VAR_db_password"
+terraform apply -var-file="envs/dev.tfvars" -var="db_password=$TF_VAR_db_password"
+```
+
+### Deploy to staging
+
+```bash
+terraform plan -var-file="envs/staging.tfvars" -var="db_password=$TF_VAR_db_password"
+terraform apply -var-file="envs/staging.tfvars" -var="db_password=$TF_VAR_db_password"
+```
+
+### Destroy
+
+```bash
+terraform destroy -var-file="envs/dev.tfvars" -var="db_password=$TF_VAR_db_password"
 ```
 
 ## CI/CD
 
-This project uses GitHub Actions for continuous integration. On every push or pull request to `main`, the pipeline runs:
+This project uses GitHub Actions for automated testing and deployment.
 
-- `terraform fmt` — checks formatting
-- `terraform validate` — validates configuration
+### Terraform CI (`terraform.yml`)
+Triggered on every **push** and **pull request** to `main`:
+- `terraform fmt -check` — enforces consistent formatting
+- `terraform validate` — checks configuration syntax
 - `terraform plan` — previews infrastructure changes
-- `tfsec` — scans for security issues
+- `tfsec` — static security analysis, flags misconfigurations
 
-Required GitHub Secrets: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `DB_PASSWORD`
+### Terraform Apply (`terraform-apply.yml`)
+Triggered on **merge to main** only:
+- Requires manual approval via GitHub Environments (`production`)
+- Runs `terraform apply -auto-approve` after approval
+- AWS credentials injected via GitHub Secrets
 
-> `db_password` is intentionally excluded from `terraform.tfvars`. Pass it via `TF_VAR_db_password` locally or via GitHub Secrets in CI.
+### Required GitHub Secrets
 
-## Inputs
+| Secret | Description |
+|--------|-------------|
+| `AWS_ACCESS_KEY_ID` | AWS access key for CI/CD |
+| `AWS_SECRET_ACCESS_KEY` | AWS secret key for CI/CD |
+| `DB_PASSWORD` | RDS master password |
 
-| Name                  | Description                    | Default          |
-| --------------------- | ------------------------------ | ---------------- |
-| region                | AWS region                     | us-east-1        |
-| instance_type         | EC2 instance type              | t2.micro         |
-| db_password           | RDS master password            | -                |
-| ssh_allowed_cidr      | CIDR allowed to SSH            | 0.0.0.0/0        |
-| private_subnet_cidr_1 | First private subnet CIDR      | 10.0.3.0/24      |
-| private_subnet_cidr_2 | Second private subnet CIDR     | 10.0.4.0/24      |
-| cluster_name          | EKS cluster name               | main-eks-cluster |
-| cluster_version       | Kubernetes version             | 1.28             |
-| node_instance_type    | EKS worker node instance type  | t3.medium        |
-| node_desired_size     | Desired number of worker nodes | 2                |
-| node_min_size         | Minimum number of worker nodes | 1                |
-| node_max_size         | Maximum number of worker nodes | 4                |
-| spot_desired_size     | Desired number of spot nodes   | 1                |
-| spot_min_size         | Minimum number of spot nodes   | 0                |
-| spot_max_size         | Maximum number of spot nodes   | 2                |
-| environment           | Deployment environment         | dev              |
+> `db_password` is excluded from tfvars. Pass it via `TF_VAR_db_password` locally or via GitHub Secrets in CI.
 
-## Outputs
+## Environments
 
-| Name                        | Description                     |
-| --------------------------- | ------------------------------- |
-| vpc_id                      | VPC ID                          |
-| instance_public_ip          | EC2 public IP                   |
-| rds_endpoint                | RDS connection endpoint         |
-| s3_bucket_name              | S3 bucket name                  |
-| eks_cluster_name            | EKS cluster name                |
-| eks_cluster_endpoint        | EKS cluster API endpoint        |
-| oidc_provider_arn           | OIDC provider ARN for IRSA      |
-| oidc_provider_url           | OIDC provider URL               |
-| cluster_autoscaler_role_arn         | Cluster autoscaler IAM role ARN           |
-| ebs_csi_driver_arn                  | EBS CSI driver IAM role ARN               |
-| aws_load_balancer_controller_arn    | AWS Load Balancer Controller IAM role ARN |
+| Environment | tfvars file | VPC CIDR | EKS Cluster | Node Size |
+|-------------|-------------|----------|-------------|-----------|
+| dev | `envs/dev.tfvars` | 10.0.0.0/16 | eks-dev | 1 node (max 2) |
+| staging | `envs/staging.tfvars` | 10.1.0.0/16 | eks-staging | 2 nodes (max 4) |
