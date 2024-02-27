@@ -12,3 +12,9 @@ variable "oidc_provider_arn" {
   description = "OIDC provider ARN for IRSA"
   type = string
 }
+
+variable "tags" {
+  description = "Common tags to apply to all resources"
+  type        = map(string)
+  default     = {}
+}

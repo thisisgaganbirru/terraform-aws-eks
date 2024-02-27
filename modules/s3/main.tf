@@ -6,7 +6,7 @@ resource "aws_s3_bucket" "app_bucket" {
     enabled = true
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "app-bucket"
-  }
+  })
 }

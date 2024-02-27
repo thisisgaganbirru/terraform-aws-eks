@@ -3,9 +3,9 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
   enable_dns_hostnames = true
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "main-vpc"
-  }
+  })
 }
 
 resource "aws_subnet" "main" {
@@ -14,11 +14,11 @@ resource "aws_subnet" "main" {
   availability_zone       = var.availability_zone
   map_public_ip_on_launch = true
 
-  tags = {
+  tags = merge(var.tags, {
     Name                                        = "public-subnet-1"
     "kubernetes.io/role/elb"                    = "1"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-  }
+  })
 }
 
 resource "aws_subnet" "main_2" {
@@ -27,11 +27,11 @@ resource "aws_subnet" "main_2" {
   availability_zone       = var.availability_zone_2
   map_public_ip_on_launch = true
 
-  tags = {
+  tags = merge(var.tags, {
     Name                                        = "public-subnet-2"
     "kubernetes.io/role/elb"                    = "1"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-  }
+  })
 }
 
 resource "aws_subnet" "private_1" {
@@ -39,11 +39,11 @@ resource "aws_subnet" "private_1" {
   cidr_block        = var.private_subnet_cidr_1
   availability_zone = var.availability_zone
 
-  tags = {
+  tags = merge(var.tags, {
     Name                                        = "private-subnet-1"
     "kubernetes.io/role/internal-elb"           = "1"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-  }
+  })
 }
 
 resource "aws_subnet" "private_2" {
@@ -51,36 +51,36 @@ resource "aws_subnet" "private_2" {
   cidr_block        = var.private_subnet_cidr_2
   availability_zone = var.availability_zone_2
 
-  tags = {
+  tags = merge(var.tags, {
     Name                                        = "private-subnet-2"
     "kubernetes.io/role/internal-elb"           = "1"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-  }
+  })
 }
 
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "main-igw"
-  }
+  })
 }
 
 resource "aws_eip" "nat" {
   vpc = true
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "nat-eip"
-  }
+  })
 }
 
 resource "aws_nat_gateway" "main" {
   allocation_id = aws_eip.nat.id
   subnet_id     = aws_subnet.main.id
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "main-nat-gw"
-  }
+  })
 
   depends_on = [aws_internet_gateway.main]
 }
@@ -93,9 +93,9 @@ resource "aws_route_table" "public" {
     gateway_id = aws_internet_gateway.main.id
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "public-rt"
-  }
+  })
 }
 
 resource "aws_route_table" "private" {
@@ -106,9 +106,9 @@ resource "aws_route_table" "private" {
     nat_gateway_id = aws_nat_gateway.main.id
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "private-rt"
-  }
+  })
 }
 
 resource "aws_route_table_association" "public_1" {

@@ -34,9 +34,9 @@ resource "aws_security_group" "web_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "web-sg"
-  }
+  })
 }
 
 resource "aws_instance" "web" {
@@ -53,9 +53,9 @@ resource "aws_instance" "web" {
     delete_on_termination = true
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "web-server"
-  }
+  })
 }
 
 resource "aws_ebs_volume" "web_data" {
@@ -63,9 +63,9 @@ resource "aws_ebs_volume" "web_data" {
   size              = 20
   type              = "gp2"
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "web-data-volume"
-  }
+  })
 }
 
 resource "aws_volume_attachment" "web_data_attach" {

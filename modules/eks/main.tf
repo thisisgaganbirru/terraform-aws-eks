@@ -10,9 +10,9 @@ resource "aws_security_group" "eks_cluster" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.cluster_name}-cluster-sg"
-  }
+  })
 }
 
 resource "aws_security_group" "eks_nodes" {
@@ -45,9 +45,9 @@ resource "aws_security_group" "eks_nodes" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.cluster_name}-node-sg"
-  }
+  })
 }
 
 resource "aws_eks_cluster" "main" {
@@ -64,9 +64,9 @@ resource "aws_eks_cluster" "main" {
 
   enabled_cluster_log_types = [ "api", "audit", "authenticator", "controllerManager", "scheduler" ]
 
-  tags = {
+  tags = merge(var.tags, {
     Name = var.cluster_name
-  }
+  })
 
   depends_on = [aws_security_group.eks_cluster]
 }
@@ -89,9 +89,9 @@ resource "aws_eks_node_group" "main" {
     max_unavailable = 1
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.cluster_name}-node-group"
-  }
+  })
 
   depends_on = [aws_eks_cluster.main]
 }
@@ -105,9 +105,9 @@ resource "aws_iam_openid_connect_provider" "eks_cluster" {
   thumbprint_list = [ data.tls_certificate.eks_cluster.certificates[0].sha1_fingerprint ]
   url = aws_eks_cluster.main.identity[0].oidc[0].issuer
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.cluster_name}-irsa"
-  }
+  })
 }
 
 resource "aws_eks_addon" "coredns" {
@@ -167,11 +167,11 @@ resource "aws_eks_node_group" "spot" {
     env = var.environment
   }
 
-  tags = {
-    Name = "${var.cluster_name}-spot"
-    "k8s.io/cluster-autoscaler/${var.cluster_name}" = "owned"
-    "k8s.io/cluster-autoscaler/enabled" = "true"
-  }
+  tags = merge(var.tags, {
+    Name                                              = "${var.cluster_name}-spot"
+    "k8s.io/cluster-autoscaler/${var.cluster_name}"  = "owned"
+    "k8s.io/cluster-autoscaler/enabled"              = "true"
+  })
 
   depends_on = [ aws_eks_cluster.main ]
 }
@@ -206,9 +206,9 @@ resource "aws_eks_node_group" "system" {
     effect = "NO_SCHEDULE"
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.cluster_name}-system"
-  }
+  })
   
   depends_on = [ aws_eks_cluster.main ]
 }
