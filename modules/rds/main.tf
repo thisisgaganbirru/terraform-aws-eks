@@ -17,18 +17,18 @@ resource "aws_security_group" "rds_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "rds-sg"
-  }
+  })
 }
 
 resource "aws_db_subnet_group" "main" {
   name       = "main-db-subnet-group"
   subnet_ids = [var.subnet_id, var.subnet_id_2]
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "main-db-subnet-group"
-  }
+  })
 }
 
 resource "aws_db_instance" "main" {
@@ -48,7 +48,7 @@ resource "aws_db_instance" "main" {
 
   skip_final_snapshot = true
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "main-db"
-  }
+  })
 }

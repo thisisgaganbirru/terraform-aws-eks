@@ -9,12 +9,16 @@ module "vpc" {
   availability_zone     = var.availability_zone
   availability_zone_2   = var.availability_zone_2
   cluster_name          = var.cluster_name
+  tags                  = local.common_tags
 }
 
 module "iam" {
   source = "./modules/iam"
 
-  s3_bucket_name = var.s3_bucket_name
+  s3_bucket_name    = var.s3_bucket_name
+  cluster_name      = var.cluster_name
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  tags              = local.common_tags
 }
 
 module "ec2" {
@@ -29,6 +33,7 @@ module "ec2" {
   ami_id               = var.ami_id
   security_group_id    = module.ec2.security_group_id
   ssh_allowed_cidr     = var.ssh_allowed_cidr
+  tags                 = local.common_tags
 }
 
 module "rds" {
@@ -41,26 +46,30 @@ module "rds" {
   subnet_id_2 = module.vpc.subnet_id_2
   vpc_id      = module.vpc.vpc_id
   web_sg_id   = module.ec2.security_group_id
+  tags        = local.common_tags
 }
 
 module "s3" {
   source = "./modules/s3"
 
   s3_bucket_name = var.s3_bucket_name
+  tags           = local.common_tags
 }
 
 module "eks" {
   source = "./modules/eks"
 
-  cluster_name       = var.cluster_name
-  cluster_version    = var.cluster_version
-  vpc_id             = module.vpc.vpc_id
-  subnet_ids         = module.vpc.private_subnet_ids
-  node_instance_type = var.node_instance_type
-  node_desired_size  = var.node_desired_size
-  node_min_size      = var.node_min_size
-  node_max_size      = var.node_max_size
-  cluster_role_arn   = module.iam.eks_cluster_role_arn
-  node_role_arn      = module.iam.eks_node_role_arn
+  cluster_name            = var.cluster_name
+  cluster_version         = var.cluster_version
+  vpc_id                  = module.vpc.vpc_id
+  subnet_ids              = module.vpc.private_subnet_ids
+  node_instance_type      = var.node_instance_type
+  node_desired_size       = var.node_desired_size
+  node_min_size           = var.node_min_size
+  node_max_size           = var.node_max_size
+  cluster_role_arn        = module.iam.eks_cluster_role_arn
+  node_role_arn           = module.iam.eks_node_role_arn
+  ebs_csi_driver_role_arn = module.iam.ebs_csi_driver_arn
+  tags                    = local.common_tags
 }
 

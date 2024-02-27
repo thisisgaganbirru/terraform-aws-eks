@@ -33,3 +33,9 @@ variable "web_sg_id" {
   description = "Web security group ID to allow MySQL access from EC2"
   type        = string
 }
+
+variable "tags" {
+  description = "Common tags to apply to all resources"
+  type        = map(string)
+  default     = {}
+}

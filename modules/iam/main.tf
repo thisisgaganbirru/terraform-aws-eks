@@ -14,9 +14,9 @@ resource "aws_iam_role" "ec2_role" {
     ]
   })
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "ec2-role"
-  }
+  })
 }
 
 resource "aws_iam_role_policy" "ec2_s3_policy" {
@@ -59,9 +59,9 @@ resource "aws_iam_role" "eks_cluster_role" {
     ]
   })
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "eks-cluster-role"
-  }
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
@@ -85,9 +85,9 @@ resource "aws_iam_role" "eks_node_role" {
     ]
   })
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "eks-node-role"
-  }
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
@@ -121,9 +121,9 @@ resource "aws_iam_role" "cluster_autoscaler" {
     ]
   })
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.cluster_name}-cluster-autoscaler"
-  }
+  })
 }
 
 resource "aws_iam_role_policy" "cluster_autoscaler_policy" {
@@ -171,9 +171,9 @@ resource "aws_iam_role" "ebs_csi_driver" {
     ]
   })
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.cluster_name}-ebs-csi-driver"
-  }
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "ebs_csi_driver_policy" {
@@ -197,9 +197,9 @@ resource "aws_iam_role" "aws_load_balancer_controller" {
     ]
   })
 
-  tags = {
+  tags = merge(var.tags, {
     Name = "${var.cluster_name}-aws-load-balancer-controller"
-  }
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller_policy" {
