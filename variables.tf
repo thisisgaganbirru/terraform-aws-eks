@@ -88,13 +88,13 @@ variable "instance_type" {
 }
 
 variable "key_name" {
-  description = "SSH key pair name for EC2 access"
+  description = "SSH key pair name for EC2 access (must exist in the target AWS region)"
   type        = string
   default     = "my-key-pair"
 }
 
 variable "ami_id" {
-  description = "AMI ID for EC2 instance"
+  description = "AMI ID for EC2 instance (defaults to Amazon Linux 2 in us-east-1)"
   type        = string
   default     = "ami-0c55b159cbfafe1f0"
 }
@@ -111,7 +111,7 @@ variable "db_name" {
 }
 
 variable "db_username" {
-  description = "RDS master username"
+  description = "RDS master username (avoid using 'admin' or 'root' in production)"
   type        = string
   default     = "admin"
 }
@@ -154,7 +154,7 @@ variable "cluster_name" {
 variable "cluster_version" {
   description = "Kubernetes version for the EKS cluster"
   type        = string
-  default     = "1.20"
+  default     = "1.28"
 }
 
 variable "node_instance_type" {
