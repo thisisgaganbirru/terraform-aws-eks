@@ -7,7 +7,7 @@ Production-grade AWS infrastructure provisioned with Terraform. This project evo
 This project provisions the following AWS infrastructure:
 
 - **VPC** — Custom VPC with public and private subnets across 2 availability zones, NAT Gateway for private subnet egress, and route tables
-- **EKS Cluster** — Managed Kubernetes cluster (v1.28) with 3 node groups:
+- **EKS Cluster** — Managed Kubernetes cluster (v1.29) with 3 node groups:
   - `main` — On-demand nodes for general workloads
   - `system` — Dedicated on-demand nodes for kube-system with `CriticalAddonsOnly` taint
   - `spot` — Spot instances for cost-optimized workloads, tagged for Cluster Autoscaler
@@ -21,7 +21,7 @@ This project provisions the following AWS infrastructure:
 
 ## Prerequisites
 
-- Terraform >= 1.6
+- Terraform >= 1.8
 - AWS CLI configured (`aws configure`)
 - Existing EC2 key pair in AWS
 - S3 bucket for remote state must exist before running `terraform init`
