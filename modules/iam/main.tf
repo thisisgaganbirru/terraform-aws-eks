@@ -117,6 +117,12 @@ resource "aws_iam_role" "cluster_autoscaler" {
         Principal = {
           Federated = var.oidc_provider_arn
         }
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_url}:sub" = "system:serviceaccount:kube-system:cluster-autoscaler"
+            "${var.oidc_provider_url}:aud" = "sts.amazonaws.com"
+          }
+        }
       }
     ]
   })
@@ -167,6 +173,12 @@ resource "aws_iam_role" "ebs_csi_driver" {
         Principal = {
           Federated = var.oidc_provider_arn
         }
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_url}:sub" = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+            "${var.oidc_provider_url}:aud" = "sts.amazonaws.com"
+          }
+        }
       }
     ]
   })
@@ -192,6 +204,12 @@ resource "aws_iam_role" "aws_load_balancer_controller" {
         Effect = "Allow"
         Principal = {
           Federated = var.oidc_provider_arn
+        }
+        Condition = {
+          StringEquals = {
+            "${var.oidc_provider_url}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
+            "${var.oidc_provider_url}:aud" = "sts.amazonaws.com"
+          }
         }
       }
     ]
