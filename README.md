@@ -7,7 +7,7 @@ Production-grade AWS infrastructure provisioned with Terraform. This project evo
 This project provisions the following AWS infrastructure:
 
 - **VPC** — Custom VPC with public and private subnets across 2 availability zones, NAT Gateway for private subnet egress, and route tables
-- **EKS Cluster** — Managed Kubernetes cluster (v1.29) with 3 node groups:
+- **EKS Cluster** — Managed Kubernetes cluster (v1.30) with 3 node groups:
   - `main` — On-demand nodes for general workloads
   - `system` — Dedicated on-demand nodes for kube-system with `CriticalAddonsOnly` taint
   - `spot` — Spot instances for cost-optimized workloads, tagged for Cluster Autoscaler
@@ -21,7 +21,7 @@ This project provisions the following AWS infrastructure:
 
 ## Prerequisites
 
-- Terraform >= 1.8
+- Terraform >= 1.9
 - AWS CLI configured (`aws configure`)
 - Existing EC2 key pair in AWS
 - S3 bucket for remote state must exist before running `terraform init`
@@ -88,31 +88,35 @@ terraform destroy -var-file="envs/dev.tfvars" -var="db_password=$TF_VAR_db_passw
 This project uses GitHub Actions for automated testing and deployment.
 
 ### Terraform CI (`terraform.yml`)
+
 Triggered on every **push** and **pull request** to `main`:
+
 - `terraform fmt -check` — enforces consistent formatting
 - `terraform validate` — checks configuration syntax
 - `terraform plan` — previews infrastructure changes
 - `tfsec` — static security analysis, flags misconfigurations
 
 ### Terraform Apply (`terraform-apply.yml`)
+
 Triggered on **merge to main** only:
+
 - Requires manual approval via GitHub Environments (`production`)
 - Runs `terraform apply -auto-approve` after approval
 - AWS credentials injected via GitHub Secrets
 
 ### Required GitHub Secrets
 
-| Secret | Description |
-|--------|-------------|
-| `AWS_ACCESS_KEY_ID` | AWS access key for CI/CD |
+| Secret                  | Description              |
+| ----------------------- | ------------------------ |
+| `AWS_ACCESS_KEY_ID`     | AWS access key for CI/CD |
 | `AWS_SECRET_ACCESS_KEY` | AWS secret key for CI/CD |
-| `DB_PASSWORD` | RDS master password |
+| `DB_PASSWORD`           | RDS master password      |
 
 > `db_password` is excluded from tfvars. Pass it via `TF_VAR_db_password` locally or via GitHub Secrets in CI.
 
 ## Environments
 
-| Environment | tfvars file | VPC CIDR | EKS Cluster | Node Size |
-|-------------|-------------|----------|-------------|-----------|
-| dev | `envs/dev.tfvars` | 10.0.0.0/16 | eks-dev | 1 node (max 2) |
-| staging | `envs/staging.tfvars` | 10.1.0.0/16 | eks-staging | 2 nodes (max 4) |
+| Environment | tfvars file           | VPC CIDR    | EKS Cluster | Node Size       |
+| ----------- | --------------------- | ----------- | ----------- | --------------- |
+| dev         | `envs/dev.tfvars`     | 10.0.0.0/16 | eks-dev     | 1 node (max 2)  |
+| staging     | `envs/staging.tfvars` | 10.1.0.0/16 | eks-staging | 2 nodes (max 4) |
