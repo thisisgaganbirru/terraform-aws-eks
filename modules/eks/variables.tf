@@ -54,7 +54,7 @@ variable "node_role_arn" {
 }
 
 variable "environment" {
-  description = "Deployment environment (dev, staging)"
+  description = "Deployment environment (dev, staging, prod)"
   type = string
   default = "dev"
 

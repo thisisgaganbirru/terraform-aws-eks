@@ -68,6 +68,10 @@ resource "aws_eks_cluster" "main" {
     Name = var.cluster_name
   })
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
   depends_on = [aws_security_group.eks_cluster]
 }
 

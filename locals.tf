@@ -10,6 +10,10 @@ locals {
       cost_center = "engineering-staging"
       owner       = "platform-team"
     }
+    prod = {
+      cost_center = "engineering-prod"
+      owner       = "platform-team"
+    }
     default = {
       cost_center = "engineering"
       owner       = "platform-team"

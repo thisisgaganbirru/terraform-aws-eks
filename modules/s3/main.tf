@@ -4,6 +4,10 @@ resource "aws_s3_bucket" "app_bucket" {
   tags = merge(var.tags, {
     Name = "app-bucket"
   })
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "aws_s3_bucket_versioning" "app_bucket" {

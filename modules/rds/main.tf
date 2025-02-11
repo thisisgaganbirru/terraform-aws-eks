@@ -55,4 +55,8 @@ resource "aws_db_instance" "main" {
   tags = merge(var.tags, {
     Name = "main-db"
   })
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }

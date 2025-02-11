@@ -117,10 +117,9 @@ variable "db_username" {
 }
 
 variable "db_password" {
-  description = "RDS master password"
+  description = "RDS master password - must be supplied via TF_VAR_db_password or GitHub Secrets, never hardcoded"
   type        = string
   sensitive   = true
-  default     = "password123"
 
   validation {
     condition     = length(var.db_password) >= 8
@@ -154,7 +153,7 @@ variable "cluster_name" {
 variable "cluster_version" {
   description = "Kubernetes version for the EKS cluster"
   type        = string
-  default     = "1.28"
+  default     = "1.30"
 }
 
 variable "node_instance_type" {
