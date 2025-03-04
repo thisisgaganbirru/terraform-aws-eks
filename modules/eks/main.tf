@@ -59,7 +59,7 @@ resource "aws_eks_cluster" "main" {
     subnet_ids              = var.subnet_ids
     security_group_ids      = [aws_security_group.eks_cluster.id]
     endpoint_private_access = true
-    endpoint_public_access  = true
+    endpoint_public_access  = var.endpoint_public_access
   }
 
   enabled_cluster_log_types = [ "api", "audit", "authenticator", "controllerManager", "scheduler" ]

@@ -86,6 +86,12 @@ variable "ebs_csi_driver_role_arn" {
   type        = string
 }
 
+variable "endpoint_public_access" {
+  description = "Whether the EKS API server endpoint is publicly accessible. Set to false in production."
+  type        = bool
+  default     = true
+}
+
 variable "tags" {
   description = "Common tags to apply to all resources"
   type        = map(string)

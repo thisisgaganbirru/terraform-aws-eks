@@ -134,9 +134,8 @@ variable "s3_bucket_name" {
 }
 
 variable "ssh_allowed_cidr" {
-  description = "CIDR allowed to SSH into EC2 - restrict to your IP"
+  description = "CIDR allowed to SSH into EC2 - must be your specific IP e.g. 203.0.113.0/32, not 0.0.0.0/0"
   type        = string
-  default     = "0.0.0.0/0"
 
   validation {
     condition     = can(cidrnetmask(var.ssh_allowed_cidr))
@@ -144,7 +143,13 @@ variable "ssh_allowed_cidr" {
   }
 }
 
-variable "cluster_name" {
+variable "endpoint_public_access" {
+  description = "Whether the EKS API server endpoint is publicly accessible. Set to false in production."
+  type        = bool
+  default     = true
+}
+
+
   description = "Name of the EKS cluster"
   type        = string
   default     = "main-eks-cluster"
