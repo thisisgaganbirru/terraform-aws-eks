@@ -4,18 +4,8 @@ variable "s3_bucket_name" {
 }
 
 variable "cluster_name" {
-  description = "EKS Cluster name"
-  type = string
-}
-
-variable "oidc_provider_arn" {
-  description = "OIDC provider ARN for IRSA"
-  type = string
-}
-
-variable "oidc_provider_url" {
-  description = "OIDC Provider URL for IRSA Condition"
-  type = string
+  description = "EKS cluster name"
+  type        = string
 }
 
 variable "tags" {

@@ -13,11 +13,6 @@ variable "subnet_id" {
   type        = string
 }
 
-variable "security_group_id" {
-  description = "Security group ID for the EC2 instance"
-  type        = string
-}
-
 variable "key_name" {
   description = "SSH key pair name"
   type        = string
@@ -41,7 +36,6 @@ variable "vpc_id" {
 variable "ssh_allowed_cidr" {
   description = "CIDR block allowed to SSH into EC2"
   type        = string
-  default     = "0.0.0.0/0"
 }
 
 variable "tags" {
