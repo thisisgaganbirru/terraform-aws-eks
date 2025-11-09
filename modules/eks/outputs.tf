@@ -20,10 +20,25 @@ output "cluster_security_group_id" {
 
 output "oidc_provider_arn" {
   description = "ARN of the OIDC Provider for IRSA"
-  value = aws_iam_openid_connect_provider.eks_cluster.arn
+  value       = aws_iam_openid_connect_provider.eks_cluster.arn
 }
 
 output "oidc_provider_url" {
   description = "URL of the OIDC Provider"
   value       = aws_iam_openid_connect_provider.eks_cluster.url
+}
+
+output "cluster_autoscaler_role_arn" {
+  description = "IAM role ARN for cluster autoscaler"
+  value       = aws_iam_role.cluster_autoscaler.arn
+}
+
+output "ebs_csi_driver_arn" {
+  description = "IAM role ARN for EBS CSI driver"
+  value       = aws_iam_role.ebs_csi_driver.arn
+}
+
+output "aws_load_balancer_controller_arn" {
+  description = "IAM role ARN for AWS Load Balancer Controller"
+  value       = aws_iam_role.aws_load_balancer_controller.arn
 }

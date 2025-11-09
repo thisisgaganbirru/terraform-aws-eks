@@ -139,12 +139,12 @@ resource "aws_eks_addon" "vpc_cni" {
 }
 
 resource "aws_eks_addon" "ebs_csi_driver" {
-  cluster_name = aws_eks_cluster.main.name
-  addon_name = "aws-ebs-csi-driver"
-  addon_version = "v1.31.0-eksbuild.1"
-  service_account_role_arn = var.ebs_csi_driver_role_arn
+  cluster_name             = aws_eks_cluster.main.name
+  addon_name               = "aws-ebs-csi-driver"
+  addon_version            = "v1.31.0-eksbuild.1"
+  service_account_role_arn = aws_iam_role.ebs_csi_driver.arn
 
-  depends_on = [ aws_eks_node_group.main ]
+  depends_on = [aws_eks_node_group.main]
 }
 
 resource "aws_eks_node_group" "spot" {
@@ -181,18 +181,18 @@ resource "aws_eks_node_group" "spot" {
 }
 
 resource "aws_eks_node_group" "system" {
-  cluster_name = aws_eks_cluster.main.name
+  cluster_name    = aws_eks_cluster.main.name
   node_group_name = "${var.cluster_name}-system"
-  node_role_arn = var.node_role_arn
-  subnet_ids = var.subnet_ids
+  node_role_arn   = var.node_role_arn
+  subnet_ids      = var.subnet_ids
 
-  capacity_type = "ON_DEMAND"
-  instance_types = [ "t3.medium" ]
+  capacity_type  = "ON_DEMAND"
+  instance_types = ["t3.medium"]
 
   scaling_config {
     desired_size = 2
-    min_size = 2
-    max_size = 2
+    min_size     = 2
+    max_size     = 2
   }
 
   update_config {
@@ -201,18 +201,140 @@ resource "aws_eks_node_group" "system" {
 
   labels = {
     role = "system"
-    env = var.environment
+    env  = var.environment
   }
-  
+
   taint {
-    key = "CriticalAddonsOnly"
-    value = "true"
+    key    = "CriticalAddonsOnly"
+    value  = "true"
     effect = "NO_SCHEDULE"
   }
 
   tags = merge(var.tags, {
     Name = "${var.cluster_name}-system"
   })
-  
-  depends_on = [ aws_eks_cluster.main ]
+
+  depends_on = [aws_eks_cluster.main]
+}
+
+# ── IRSA roles (use OIDC provider created above) ───────────────────────────────
+
+resource "aws_iam_role" "cluster_autoscaler" {
+  name = "${var.cluster_name}-cluster-autoscaler"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks_cluster.arn
+        }
+        Condition = {
+          StringEquals = {
+            "${aws_iam_openid_connect_provider.eks_cluster.url}:sub" = "system:serviceaccount:kube-system:cluster-autoscaler"
+            "${aws_iam_openid_connect_provider.eks_cluster.url}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = merge(var.tags, {
+    Name = "${var.cluster_name}-cluster-autoscaler"
+  })
+}
+
+resource "aws_iam_role_policy" "cluster_autoscaler" {
+  name = "${var.cluster_name}-cluster-autoscaler-policy"
+  role = aws_iam_role.cluster_autoscaler.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "autoscaling:DescribeAutoScalingGroups",
+          "autoscaling:DescribeAutoScalingInstances",
+          "autoscaling:DescribeLaunchConfigurations",
+          "autoscaling:DescribeScalingActivities",
+          "autoscaling:DescribeTags",
+          "autoscaling:SetDesiredCapacity",
+          "autoscaling:TerminateInstanceInAutoScalingGroup",
+          "ec2:DescribeImages",
+          "ec2:DescribeInstanceTypes",
+          "ec2:DescribeLaunchTemplateVersions",
+          "ec2:GetInstanceTypesFromInstanceRequirements",
+          "eks:DescribeNodegroup"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "ebs_csi_driver" {
+  name = "${var.cluster_name}-ebs-csi-driver"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks_cluster.arn
+        }
+        Condition = {
+          StringEquals = {
+            "${aws_iam_openid_connect_provider.eks_cluster.url}:sub" = "system:serviceaccount:kube-system:ebs-csi-controller-sa"
+            "${aws_iam_openid_connect_provider.eks_cluster.url}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = merge(var.tags, {
+    Name = "${var.cluster_name}-ebs-csi-driver"
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ebs_csi_driver_policy" {
+  role       = aws_iam_role.ebs_csi_driver.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+}
+
+resource "aws_iam_role" "aws_load_balancer_controller" {
+  name = "${var.cluster_name}-aws-load-balancer-controller"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks_cluster.arn
+        }
+        Condition = {
+          StringEquals = {
+            "${aws_iam_openid_connect_provider.eks_cluster.url}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller"
+            "${aws_iam_openid_connect_provider.eks_cluster.url}:aud" = "sts.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+
+  tags = merge(var.tags, {
+    Name = "${var.cluster_name}-aws-load-balancer-controller"
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "aws_load_balancer_controller_policy" {
+  role       = aws_iam_role.aws_load_balancer_controller.name
+  policy_arn = "arn:aws:iam::aws:policy/ElasticLoadBalancingFullAccess"
 }
