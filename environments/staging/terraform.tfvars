@@ -22,3 +22,4 @@ environment           = "staging"
 spot_desired_size     = 2
 spot_min_size         = 0
 spot_max_size         = 4
+endpoint_public_access = true

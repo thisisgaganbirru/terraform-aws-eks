@@ -22,3 +22,4 @@ environment           = "dev"
 spot_desired_size     = 1
 spot_min_size         = 0
 spot_max_size         = 2
+endpoint_public_access = true

@@ -6,8 +6,8 @@
 
 # Variable files with sensitive data
 *.tfvars
-!terraform.tfvars.example
-!envs/*.tfvars
+!environments/**/*.tfvars
+!environments/**/*.tfvars.example
 
 # Crash log files
 crash.log
