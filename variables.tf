@@ -149,7 +149,7 @@ variable "endpoint_public_access" {
   default     = true
 }
 
-
+variable "cluster_name" {
   description = "Name of the EKS cluster"
   type        = string
   default     = "main-eks-cluster"
@@ -183,5 +183,34 @@ variable "node_max_size" {
   description = "Maximum number of EKS worker nodes"
   type        = number
   default     = 4
+}
+
+variable "environment" {
+  description = "Deployment environment (dev, staging, prod)"
+  type        = string
+  default     = "dev"
+
+  validation {
+    condition     = contains(["dev", "staging", "prod"], var.environment)
+    error_message = "Environment must be dev, staging or prod."
+  }
+}
+
+variable "spot_desired_size" {
+  description = "Desired number of spot worker nodes"
+  type        = number
+  default     = 1
+}
+
+variable "spot_min_size" {
+  description = "Minimum number of spot worker nodes"
+  type        = number
+  default     = 0
+}
+
+variable "spot_max_size" {
+  description = "Maximum number of spot worker nodes"
+  type        = number
+  default     = 2
 }
 
