@@ -93,12 +93,6 @@ variable "key_name" {
   default     = "my-key-pair"
 }
 
-variable "ami_id" {
-  description = "AMI ID for EC2 instance (defaults to Amazon Linux 2 in us-east-1)"
-  type        = string
-  default     = "ami-0c55b159cbfafe1f0"
-}
-
 variable "db_name" {
   description = "RDS database name"
   type        = string

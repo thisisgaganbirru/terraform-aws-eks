@@ -43,7 +43,6 @@ module "platform" {
   environment            = var.environment
   instance_type          = var.instance_type
   key_name               = var.key_name
-  ami_id                 = var.ami_id
   availability_zone      = var.availability_zone
   ssh_allowed_cidr       = var.ssh_allowed_cidr
   s3_bucket_name         = var.s3_bucket_name

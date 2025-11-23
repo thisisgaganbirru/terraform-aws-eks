@@ -113,10 +113,6 @@ variable "key_name" {
   type        = string
 }
 
-variable "ami_id" {
-  description = "AMI ID for EC2 instance"
-  type        = string
-}
 
 variable "availability_zone" {
   description = "Primary availability zone"

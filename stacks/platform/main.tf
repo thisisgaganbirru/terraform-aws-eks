@@ -28,7 +28,6 @@ module "compute" {
   vpc_id               = var.vpc_id
   availability_zone    = var.availability_zone
   iam_instance_profile = var.instance_profile_name
-  ami_id               = var.ami_id
   ssh_allowed_cidr     = var.ssh_allowed_cidr
   tags                 = var.tags
 }
