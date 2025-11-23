@@ -25,31 +25,20 @@ Production-grade AWS infrastructure built with Terraform — a layered stack arc
 
 ```mermaid
 flowchart TD
-    subgraph Root["Root Module"]
-        MAIN[main.tf]
-    end
-
+    MAIN[main.tf - Root]
     subgraph Foundation["stacks/foundation"]
         NET[networking]
         SEC[security]
     end
-
     subgraph Platform["stacks/platform"]
         EKS[eks]
         COMP[compute]
         STOR[storage]
     end
 
-    subgraph Envs["environments/"]
-        DEV[dev]
-        STG[staging]
-        PRD[prod]
-    end
-
     MAIN --> Foundation
     MAIN --> Platform
     Foundation -->|vpc_id, subnet_ids, role_arns| Platform
-    Envs -.->|var-file + backend-config| MAIN
 ```
 
 ```mermaid
