@@ -23,44 +23,35 @@ Production-grade AWS infrastructure built with Terraform — a layered stack arc
 
 ## Architecture
 
-```mermaid
-flowchart TD
-    MAIN[main.tf - Root]
-    subgraph Foundation["stacks/foundation"]
-        NET[networking]
-        SEC[security]
-    end
-    subgraph Platform["stacks/platform"]
-        EKS[eks]
-        COMP[compute]
-        STOR[storage]
-    end
-
-    MAIN --> Foundation
-    MAIN --> Platform
-    Foundation -->|vpc_id, subnet_ids, role_arns| Platform
+```text
+                    ┌─────────────────────────────────────┐
+                    │           main.tf (Root)             │
+                    └──────────────┬──────────────────────┘
+                                   │
+               ┌───────────────────┴────────────────────┐
+               │                                        │
+    ┌──────────▼──────────┐               ┌────────────▼────────────┐
+    │  stacks/foundation  │               │   stacks/platform       │
+    │                     │               │                         │
+    │  ├── networking     │──vpc_id ──────►  ├── eks               │
+    │  └── security       │  subnet_ids   │  ├── compute            │
+    │                     │  role_arns    │  └── storage            │
+    └─────────────────────┘               └─────────────────────────┘
 ```
 
-```mermaid
-flowchart TD
-    subgraph VPC["VPC per environment"]
-        subgraph PUB["Public Subnets"]
-            PA[AZ-A - EC2 and ALB]
-            PB[AZ-B]
-        end
-        subgraph PRI["Private Subnets"]
-            PRA[AZ-A - EKS Nodes]
-            PRB[AZ-B - EKS Nodes]
-        end
-        IGW([Internet Gateway])
-        NAT[NAT Gateway]
-    end
+**Network layout per environment:**
 
-    IGW --> PA
-    IGW --> PB
-    PA --> NAT
-    NAT --> PRA
-    NAT --> PRB
+```text
+    VPC (10.x.0.0/16)
+    ├── Public Subnets
+    │   ├── AZ-A  10.x.1.0/24  ← EC2, ALB
+    │   └── AZ-B  10.x.2.0/24
+    │         │
+    │       NAT GW
+    │         │
+    └── Private Subnets
+        ├── AZ-A  10.x.3.0/24  ← EKS Nodes
+        └── AZ-B  10.x.4.0/24  ← EKS Nodes
 ```
 
 ## What's Provisioned
