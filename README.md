@@ -1,7 +1,7 @@
 # terraform-aws-eks
 
 [![CI](https://github.com/thisisgaganbirru/terraform-aws-eks/actions/workflows/terraform.yml/badge.svg)](https://github.com/thisisgaganbirru/terraform-aws-eks/actions/workflows/terraform.yml)
-[![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.9-623CE4?style=flat&logo=terraform&logoColor=white)](https://www.terraform.io)
+[![Terraform](https://img.shields.io/badge/Terraform-%3E%3D1.10-623CE4?style=flat&logo=terraform&logoColor=white)](https://www.terraform.io)
 [![AWS](https://img.shields.io/badge/AWS-EKS%20%7C%20RDS%20%7C%20S3-FF9900?style=flat&logo=amazonaws&logoColor=white)](https://aws.amazon.com)
 [![License](https://img.shields.io/github/license/thisisgaganbirru/terraform-aws-eks?style=flat)](LICENSE)
 
@@ -90,7 +90,7 @@ terraform-aws-eks/
 ├── environments/
 │   ├── dev/
 │   │   ├── terraform.tfvars       # dev input values
-│   │   └── backend.tfvars         # dev S3 state key + DynamoDB table
+│   │   └── backend.tfvars         # dev S3 state key + use_lockfile
 │   ├── staging/
 │   │   ├── terraform.tfvars
 │   │   └── backend.tfvars
@@ -104,10 +104,10 @@ terraform-aws-eks/
 
 ## Prerequisites
 
-- Terraform ≥ 1.9
+- Terraform ≥ 1.10
 - AWS CLI configured with credentials (`aws configure`)
 - An existing EC2 key pair in the target region
-- An S3 bucket and DynamoDB table for remote state (must exist before `terraform init`)
+- An S3 bucket for remote state (must exist before `terraform init` — no DynamoDB table needed)
 
 > [!IMPORTANT]
 > `db_password` has no default value and no fallback. It must be passed via `TF_VAR_db_password` environment variable or GitHub Secrets. Never set it in a `.tfvars` file.
@@ -222,7 +222,7 @@ Every resource receives tags via `merge(var.tags, { Name = "..." })`. Tags are r
 | `Environment`      | `dev` / `staging` / `prod`                                     |
 | `Owner`            | `platform-team`                                                |
 | `CostCenter`       | `engineering-dev` / `engineering-staging` / `engineering-prod` |
-| `TerraformVersion` | `1.9`                                                          |
+| `TerraformVersion` | `1.10`                                                         |
 | `EKSVersion`       | `1.30`                                                         |
 
 Enables AWS Cost Explorer filtering by environment and cost center without any manual tagging.
