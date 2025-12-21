@@ -125,7 +125,7 @@ resource "aws_eks_addon" "coredns" {
 resource "aws_eks_addon" "kube_proxy" {
   cluster_name = aws_eks_cluster.main.name
   addon_name = "kube-proxy"
-  addon_version = "v1.30.0-eksbuild.3"
+  addon_version = "v1.30.6-eksbuild.3"
 
   depends_on = [ aws_eks_node_group.main ]
 }
@@ -133,7 +133,7 @@ resource "aws_eks_addon" "kube_proxy" {
 resource "aws_eks_addon" "vpc_cni" {
   cluster_name = aws_eks_cluster.main.name
   addon_name = "vpc-cni"
-  addon_version = "v1.18.3-eksbuild.1"
+  addon_version = "v1.19.2-eksbuild.1"
   depends_on = [ aws_eks_node_group.main ]
   
 }
@@ -141,7 +141,7 @@ resource "aws_eks_addon" "vpc_cni" {
 resource "aws_eks_addon" "ebs_csi_driver" {
   cluster_name             = aws_eks_cluster.main.name
   addon_name               = "aws-ebs-csi-driver"
-  addon_version            = "v1.31.0-eksbuild.1"
+  addon_version            = "v1.37.0-eksbuild.1"
   service_account_role_arn = aws_iam_role.ebs_csi_driver.arn
 
   depends_on = [aws_eks_node_group.main]
