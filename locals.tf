@@ -27,8 +27,8 @@ locals {
     Environment      = var.environment
     Owner            = local.current_env["owner"]
     CostCenter       = local.current_env["cost_center"]
-    TerraformVersion = "1.9"
-    EKSVersion       = "1.30"
+    TerraformVersion = var.terraform_version
+    EKSVersion       = var.cluster_version
   }
 }
 

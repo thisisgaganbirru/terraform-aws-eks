@@ -68,10 +68,6 @@ resource "aws_eks_cluster" "main" {
     Name = var.cluster_name
   })
 
-  lifecycle {
-    prevent_destroy = true
-  }
-
   depends_on = [aws_security_group.eks_cluster]
 }
 
@@ -117,7 +113,7 @@ resource "aws_iam_openid_connect_provider" "eks_cluster" {
 resource "aws_eks_addon" "coredns" {
   cluster_name = aws_eks_cluster.main.name
   addon_name = "coredns"
-  addon_version = "v1.11.3-eksbuild.1"
+  addon_version = var.addon_version_coredns
 
   depends_on = [ aws_eks_node_group.main ]
 }
@@ -125,7 +121,7 @@ resource "aws_eks_addon" "coredns" {
 resource "aws_eks_addon" "kube_proxy" {
   cluster_name = aws_eks_cluster.main.name
   addon_name = "kube-proxy"
-  addon_version = "v1.30.6-eksbuild.3"
+  addon_version = var.addon_version_kube_proxy
 
   depends_on = [ aws_eks_node_group.main ]
 }
@@ -133,7 +129,7 @@ resource "aws_eks_addon" "kube_proxy" {
 resource "aws_eks_addon" "vpc_cni" {
   cluster_name = aws_eks_cluster.main.name
   addon_name = "vpc-cni"
-  addon_version = "v1.19.2-eksbuild.1"
+  addon_version = var.addon_version_vpc_cni
   depends_on = [ aws_eks_node_group.main ]
   
 }
@@ -141,7 +137,7 @@ resource "aws_eks_addon" "vpc_cni" {
 resource "aws_eks_addon" "ebs_csi_driver" {
   cluster_name             = aws_eks_cluster.main.name
   addon_name               = "aws-ebs-csi-driver"
-  addon_version            = "v1.37.0-eksbuild.1"
+  addon_version            = var.addon_version_ebs_csi
   service_account_role_arn = aws_iam_role.ebs_csi_driver.arn
 
   depends_on = [aws_eks_node_group.main]
