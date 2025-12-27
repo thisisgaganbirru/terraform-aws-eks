@@ -154,3 +154,69 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "addon_version_coredns" {
+  description = "CoreDNS addon version"
+  type        = string
+  default     = "v1.11.4-eksbuild.2"
+}
+
+variable "addon_version_kube_proxy" {
+  description = "kube-proxy addon version"
+  type        = string
+  default     = "v1.31.3-eksbuild.2"
+}
+
+variable "addon_version_vpc_cni" {
+  description = "VPC CNI addon version"
+  type        = string
+  default     = "v1.19.3-eksbuild.1"
+}
+
+variable "addon_version_ebs_csi" {
+  description = "EBS CSI driver addon version"
+  type        = string
+  default     = "v1.38.1-eksbuild.1"
+}
+
+variable "deletion_protection" {
+  description = "Enable deletion protection for RDS instance"
+  type        = bool
+  default     = false
+}
+
+variable "db_engine_version" {
+  description = "MySQL engine version for RDS"
+  type        = string
+  default     = "8.0"
+}
+
+variable "db_instance_class" {
+  description = "RDS instance class"
+  type        = string
+  default     = "db.t3.micro"
+}
+
+variable "db_allocated_storage" {
+  description = "Allocated storage for RDS instance in GB"
+  type        = number
+  default     = 20
+}
+
+variable "db_backup_retention_period" {
+  description = "Number of days to retain RDS automated backups"
+  type        = number
+  default     = 7
+}
+
+variable "root_volume_size" {
+  description = "Size of the root EBS volume in GB"
+  type        = number
+  default     = 20
+}
+
+variable "data_volume_size" {
+  description = "Size of the data EBS volume in GB"
+  type        = number
+  default     = 20
+}

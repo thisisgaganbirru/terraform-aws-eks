@@ -36,9 +36,9 @@ resource "aws_db_subnet_group" "main" {
 resource "aws_db_instance" "main" {
   identifier        = "main-db"
   engine            = "mysql"
-  engine_version    = "8.0"
-  instance_class    = "db.t3.micro"
-  allocated_storage = 20
+  engine_version    = var.db_engine_version
+  instance_class    = var.db_instance_class
+  allocated_storage = var.db_allocated_storage
   storage_type      = "gp2"
 
   db_name  = var.db_name
@@ -49,8 +49,8 @@ resource "aws_db_instance" "main" {
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
 
   storage_encrypted         = true
-  backup_retention_period   = 7
-  deletion_protection       = true
+  backup_retention_period   = var.db_backup_retention_period
+  deletion_protection       = var.deletion_protection
   skip_final_snapshot       = false
   final_snapshot_identifier = "${var.db_name}-final-snapshot"
 
@@ -58,9 +58,6 @@ resource "aws_db_instance" "main" {
     Name = "main-db"
   })
 
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 # ── S3 ─────────────────────────────────────────────────────────────────────────
@@ -72,9 +69,6 @@ resource "aws_s3_bucket" "app_bucket" {
     Name = "app-bucket"
   })
 
-  lifecycle {
-    prevent_destroy = true
-  }
 }
 
 resource "aws_s3_bucket_versioning" "app_bucket" {

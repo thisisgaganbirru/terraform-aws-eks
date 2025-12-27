@@ -33,6 +33,18 @@ variable "ssh_allowed_cidr" {
   type        = string
 }
 
+variable "root_volume_size" {
+  description = "Size of the root EBS volume in GB"
+  type        = number
+  default     = 20
+}
+
+variable "data_volume_size" {
+  description = "Size of the additional data EBS volume in GB"
+  type        = number
+  default     = 20
+}
+
 variable "tags" {
   description = "Common tags to apply to all resources"
   type        = map(string)

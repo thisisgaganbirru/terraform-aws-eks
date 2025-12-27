@@ -39,6 +39,36 @@ variable "s3_bucket_name" {
   type        = string
 }
 
+variable "deletion_protection" {
+  description = "Enable deletion protection for RDS instance. Set to true in production."
+  type        = bool
+  default     = false
+}
+
+variable "db_engine_version" {
+  description = "MySQL engine version for RDS"
+  type        = string
+  default     = "8.0"
+}
+
+variable "db_instance_class" {
+  description = "RDS instance class"
+  type        = string
+  default     = "db.t3.micro"
+}
+
+variable "db_allocated_storage" {
+  description = "Allocated storage for RDS instance in GB"
+  type        = number
+  default     = 20
+}
+
+variable "db_backup_retention_period" {
+  description = "Number of days to retain RDS automated backups"
+  type        = number
+  default     = 7
+}
+
 variable "tags" {
   description = "Common tags to apply to all resources"
   type        = map(string)

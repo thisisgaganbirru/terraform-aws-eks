@@ -1,10 +1,10 @@
 data "aws_ami" "amazon_linux" {
   most_recent = true
-  owners      = ["amazon"]
+  owners      = ["099720109477"] # Canonical
 
   filter {
     name   = "name"
-    values = ["amzn-ami-hvm-*-x86_64-gp2"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
   }
 }
 
@@ -49,7 +49,7 @@ resource "aws_instance" "web" {
 
   root_block_device {
     volume_type           = "gp2"
-    volume_size           = 20
+    volume_size           = var.root_volume_size
     delete_on_termination = true
   }
 
@@ -60,7 +60,7 @@ resource "aws_instance" "web" {
 
 resource "aws_ebs_volume" "web_data" {
   availability_zone = var.availability_zone
-  size              = 20
+  size              = var.data_volume_size
   type              = "gp2"
 
   tags = merge(var.tags, {

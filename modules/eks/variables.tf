@@ -87,6 +87,30 @@ variable "endpoint_public_access" {
   default     = true
 }
 
+variable "addon_version_coredns" {
+  description = "CoreDNS addon version compatible with the cluster version"
+  type        = string
+  default     = "v1.11.4-eksbuild.2"
+}
+
+variable "addon_version_kube_proxy" {
+  description = "kube-proxy addon version compatible with the cluster version"
+  type        = string
+  default     = "v1.31.3-eksbuild.2"
+}
+
+variable "addon_version_vpc_cni" {
+  description = "VPC CNI addon version compatible with the cluster version"
+  type        = string
+  default     = "v1.19.3-eksbuild.1"
+}
+
+variable "addon_version_ebs_csi" {
+  description = "EBS CSI driver addon version compatible with the cluster version"
+  type        = string
+  default     = "v1.38.1-eksbuild.1"
+}
+
 variable "tags" {
   description = "Common tags to apply to all resources"
   type        = map(string)
