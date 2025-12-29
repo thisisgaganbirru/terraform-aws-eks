@@ -21,6 +21,9 @@ override.tf.json
 # keep lockfile in version control
 !.terraform.lock.hcl
 
+# SSH private keys
+*.pem
+
 # terraform plan output files
 *.tfplan
 *.tfstate.backup
